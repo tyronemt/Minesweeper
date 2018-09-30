@@ -141,10 +141,10 @@ def main():
 		elif (os.path.isfile(inputFile)):
 			world = World(filename=inputFile, aiType=aiType, verbose=verbose, debug=debug)
 			score = world.run()
-            if score > 0:
-                print("WORLD COMPLETE")
-            else:
-                print("WORLD INCOMPLETE")
+			if score > 0:
+			    print("WORLD COMPLETE")
+			else:
+			    print("WORLD INCOMPLETE")
 
 		# If inputFileis an invalid path
 		else:
