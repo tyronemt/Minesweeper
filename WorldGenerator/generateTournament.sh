@@ -2,11 +2,6 @@
 
 rm -rf Problems
 mkdir Problems
-cd Problems
-mkdir Beginner
-mkdir Intermediate
-mkdir Expert
-cd ..
  
 python3 WorldGenerator.py 1000 Beginner_world_ 8 8 10
 
