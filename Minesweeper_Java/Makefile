@@ -26,6 +26,7 @@ compile:
 	@javac -classpath ".:jars/*" -Xlint:unchecked src/*.java 
 	@echo "creating executable jar file.."
 	@jar cvfm mine.jar manifest.txt src/*.class > /dev/null
+	@mkdir bin
 	@mv src/*.class bin
 	@mv mine.jar bin
 	@cp -r jars bin
@@ -46,4 +47,4 @@ submission:
 	@echo "Done."
 
 clean:
-	rm -rf bin doc *.zip
+	rm -rf bin *.zip
