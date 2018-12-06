@@ -26,7 +26,6 @@ compile:
 	@javac -classpath ".:jars/*" -Xlint:unchecked src/*.java 
 	@echo "creating executable jar file.."
 	@jar cvfm mine.jar manifest.txt src/*.class > /dev/null
-	@mkdir bin doc
 	@mv src/*.class bin
 	@mv mine.jar bin
 	@cp -r jars bin

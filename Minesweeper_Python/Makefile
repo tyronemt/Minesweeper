@@ -28,7 +28,6 @@ RAW_SOURCES = \
 
 SOURCE_DIR = src
 BIN_DIR = bin
-DOC_DIR = doc
 SOURCES = $(foreach s, $(RAW_SOURCES), $(SOURCE_DIR)/$(s))
 
 all: $(SOURCES)
@@ -41,7 +40,6 @@ all: $(SOURCES)
 	 fi
 	@rm -rf $(BIN_DIR)
 	@mkdir -p $(BIN_DIR)
-	@mkdir -p $(DOC_DIR)
 	@cp -a src/__pycache__/. bin
 	@for file in bin/* ; \
 	do \
@@ -54,4 +52,4 @@ submission: all
 	@echo ""
 	@read -p "Enter Team Name (No spaces, '_', '/', '*'): " teamName; \
 	 echo ""; \
-	 zip -rqq s_$${teamName}.zip $(SOURCE_DIR) $(BIN_DIR) $(DOC_DIR)
+	 zip -rqq s_$${teamName}.zip $(SOURCE_DIR) $(BIN_DIR) 
