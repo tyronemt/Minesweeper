@@ -52,6 +52,7 @@ class MyAI( AI ):
 		if not self.__isGameOver:
 			action = AI.Action.UNCOVER
 			x, y = self.__getMove()
+			self.__printBoard()
 			return Action(action, x, y)
 		else:
 			action = AI.Action.LEAVE
@@ -89,11 +90,10 @@ class MyAI( AI ):
 	def __printBoard(self):
 		''' 
 		For debugging purposes I guess
-		It should print it in terms of the known debugging board
 		'''
 		print()
-		for row in self.__board[::-1]:
-			temp = [str(i) for i in row]
+		for row in self.__board[:]:
+			temp = [str(i) for i in row[:]]
 			print('  '.join(temp))
 		print()
 
