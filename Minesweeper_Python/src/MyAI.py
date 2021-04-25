@@ -81,7 +81,7 @@ class MyAI( AI ):
 	##		         ----------------				   ##
 	#####################################################
 	def __updateGame(self):
-		self.__board[self.__lastX][self.__lastY] = self.__tileNumState
+		self.__board[self.__lastY][self.__lastX] = self.__tileNumState
 		self.__totalTiles -= 1
 		if self.__totalMines == self.__totalTiles:
 			self.__isGameOver == True
@@ -90,9 +90,10 @@ class MyAI( AI ):
 	def __printBoard(self):
 		''' 
 		For debugging purposes I guess
+		It works now
 		'''
 		print()
-		for row in self.__board[:]:
+		for row in self.__board[::-1]:
 			temp = [str(i) for i in row[:]]
 			print('  '.join(temp))
 		print()
@@ -102,7 +103,7 @@ class MyAI( AI ):
 		'''
 		Index starts at 1 just to stay consistent with the handling of indexing
 		'''
-		val = self.__board[x][y]
+		val = self.__board[y][x]
 		return None if val  == 'N' else val
 
 
@@ -123,8 +124,8 @@ class MyAI( AI ):
 		x = y = 0
 		if len(self.__safeMoves) :
 			x, y = self.__safeMoves.pop(0)
-			self.__lastX = x
-			self.__lastY = y
+		self.__lastX = x
+		self.__lastY = y
 		
 		return x, y
 
