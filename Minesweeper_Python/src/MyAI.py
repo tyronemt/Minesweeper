@@ -11,9 +11,26 @@
 #
 #				- DO NOT MAKE CHANGES TO THIS FILE.
 # ==============================CS-199==================================
-
 from AI import AI
 from Action import Action
+
+class Board:
+	def __init__(self, arr):
+		self.__board = arr
+	
+	def __getitem__(self,key):
+		return self.__board[key]
+
+	def __iter__(self):
+		return self.__board
+	
+	def __str__(self):
+		s = "\n"
+		for row in self.__board[::-1]:
+			temp = [str(i) for i in row[:]]
+			s += '  '.join(temp)
+			s += '\n'
+		return s
 
 
 class MyAI( AI ):
@@ -29,7 +46,8 @@ class MyAI( AI ):
 		self.__colDim = colDimension
 		self.__totalTiles = rowDimension * colDimension
 
-		self.__board = [['N' for i in range(self.__colDim)] for j in range(self.__rowDim)]  # Not sure whether to keep this
+		# self.__board = [['N' for i in range(self.__colDim)] for j in range(self.__rowDim)]  # Not sure whether to keep this
+		self.__board = Board([[ 'N' for i in range(self.__colDim)] for j in range(self.__rowDim)])
 		self.__lastX = startX
 		self.__lastY = startY
 		self.__totalMines = totalMines
@@ -52,7 +70,8 @@ class MyAI( AI ):
 		if not self.__isGameOver:
 			action = AI.Action.UNCOVER
 			x, y = self.__getMove()
-			self.__printBoard()
+			# self.__printBoard()
+			print(self.__board)
 			return Action(action, x, y)
 		else:
 			action = AI.Action.LEAVE
@@ -87,16 +106,16 @@ class MyAI( AI ):
 			self.__isGameOver == True
 
 
-	def __printBoard(self):
-		''' 
-		For debugging purposes I guess
-		It works now
-		'''
-		print()
-		for row in self.__board[::-1]:
-			temp = [str(i) for i in row[:]]
-			print('  '.join(temp))
-		print()
+	# def __printBoard(self):
+	# 	''' 
+	# 	For debugging purposes I guess
+	# 	It works now
+	# 	'''
+	# 	print()
+	# 	for row in self.__board[::-1]:
+	# 		temp = [str(i) for i in row[:]]
+	# 		print('  '.join(temp))
+	# 	print()
 
 
 	def __getTileAt(self, x, y):
@@ -130,5 +149,3 @@ class MyAI( AI ):
 		return x, y
 
 
-
-		
