@@ -57,6 +57,7 @@ class MyAI( AI ):
 		self.__tileNumState = None
 		self.__isGameOver = False
 		self.__safeMoves = []
+		self.__vistedMoves = []
 		########################################################################
 		#							YOUR CODE ENDS							   #
 		########################################################################
@@ -107,6 +108,8 @@ class MyAI( AI ):
 	#####################################################
 	def __updateGame(self):
 		self.__board[self.__lastY][self.__lastX] = self.__tileNumState
+		if self.__tileNumState > 0:
+				self.__vistedMoves.append(((self.__lastX,self.__lastY), self.__tileNumState))
 		self.__totalTiles -= 1
 		if self.__totalMines == self.__totalTiles:
 			self.__isGameOver == True
@@ -148,6 +151,7 @@ class MyAI( AI ):
 			x, y = self.__safeMoves.pop(0)
 			self.__lastX = x
 			self.__lastY = y
+
 			return x, y
 		else:
 			return None, None
@@ -155,7 +159,16 @@ class MyAI( AI ):
 	def __findBomb(self):
 		x, y = self.__lastX, self.__lastY
 		tempBoard = self.__makeTempBoard(x, y)
+		minTile = 10
+		for row in tempBoard:
+			for tile in row:
+				if tile != 'N' and tile != 0 and tile < minTile:
+					minTile = tile
 		
+		
+				
+
+
 
 		
 	def __makeTempBoard(self, x,y):
