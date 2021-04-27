@@ -58,6 +58,7 @@ class MyAI( AI ):
 		self.__isGameOver = False
 		self.__safeMoves = []
 		self.__vistedMoves = []
+		self.__flagCoor = []
 		########################################################################
 		#							YOUR CODE ENDS							   #
 		########################################################################
@@ -157,13 +158,10 @@ class MyAI( AI ):
 			return None, None
 	
 	def __findBomb(self):
-		x, y = self.__lastX, self.__lastY
-		tempBoard = self.__makeTempBoard(x, y)
-		minTile = 10
-		for row in tempBoard:
-			for tile in row:
-				if tile != 'N' and tile != 0 and tile < minTile:
-					minTile = tile
+		# Go through each tile and check if the number of uncover tiles in its grid = its tile number
+		# if so the remaining tiles are bombs and should be flagged
+		# save all the flag x,y coor
+		pass
 		
 		
 				
