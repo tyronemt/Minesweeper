@@ -22,12 +22,12 @@ class Board:
 		return self.__board[key]
 
 	def __iter__(self):
-		return self.__board
+		return iter(self.__board)
 	
 	def __str__(self):
 		s = "\n"
 		for row in self.__board[::-1]:
-			temp = [str(i) for i in row[:]]
+			temp = [' ' if i == 0 else str(i)  for i in row[:]]
 			s += '  '.join(temp)
 			s += '\n'
 		return s
@@ -66,12 +66,12 @@ class MyAI( AI ):
 		########################################################################
 		self.__tileNumState = number
 		self.__updateGame()
-		self.__findSafeMoves()
 		if not self.__isGameOver:
+			self.__findSafeMoves()
 			action = AI.Action.UNCOVER
 			x, y = self.__getMove()
 			# self.__printBoard()
-			print(self.__board)
+			# print(self.__board)
 			return Action(action, x, y)
 		else:
 			action = AI.Action.LEAVE
@@ -119,9 +119,6 @@ class MyAI( AI ):
 
 
 	def __getTileAt(self, x, y):
-		'''
-		Index starts at 1 just to stay consistent with the handling of indexing
-		'''
 		val = self.__board[y][x]
 		return None if val  == 'N' else val
 
@@ -141,10 +138,12 @@ class MyAI( AI ):
 
 	def __getMove(self):
 		x = y = 0
-		if len(self.__safeMoves) :
+		if len(self.__safeMoves):
 			x, y = self.__safeMoves.pop(0)
 		self.__lastX = x
 		self.__lastY = y
+
+		
 		
 		return x, y
 
