@@ -15,8 +15,10 @@ from AI import AI
 from Action import Action
 
 class Board:
-	def __init__(self, arr):
+	def __init__(self, arr, currentXY):
 		self.__board = arr
+		self.x, self.y  = currentXY
+
 	
 	def __getitem__(self,key):
 		return self.__board[key]
@@ -33,6 +35,7 @@ class Board:
 		return s
 
 
+
 class MyAI( AI ):
 
 	def __init__(self, rowDimension, colDimension, totalMines, startX, startY):
@@ -47,7 +50,7 @@ class MyAI( AI ):
 		self.__totalTiles = rowDimension * colDimension
 
 		# self.__board = [['N' for i in range(self.__colDim)] for j in range(self.__rowDim)]  # Not sure whether to keep this
-		self.__board = Board([[ 'N' for i in range(self.__colDim)] for j in range(self.__rowDim)])
+		self.__board = Board([[ 'N' for i in range(self.__colDim)] for j in range(self.__rowDim)], (startX, startY))
 		self.__lastX = startX
 		self.__lastY = startY
 		self.__totalMines = totalMines
@@ -70,6 +73,9 @@ class MyAI( AI ):
 			self.__findSafeMoves()
 			action = AI.Action.UNCOVER
 			x, y = self.__getMove()
+			if x == y == None:
+				action = AI.Action.FLAG
+
 			# self.__printBoard()
 			# print(self.__board)
 			return Action(action, x, y)
@@ -118,10 +124,10 @@ class MyAI( AI ):
 	# 	print()
 
 
+
 	def __getTileAt(self, x, y):
 		val = self.__board[y][x]
 		return None if val  == 'N' else val
-
 
 	def __findSafeMoves(self):
 		if self.__tileNumState == 0:
@@ -140,11 +146,29 @@ class MyAI( AI ):
 		x = y = 0
 		if len(self.__safeMoves):
 			x, y = self.__safeMoves.pop(0)
-		self.__lastX = x
-		self.__lastY = y
+			self.__lastX = x
+			self.__lastY = y
+			return x, y
+		else:
+			return None, None
+	
+	def __findBomb(self):
+		x, y = self.__lastX, self.__lastY
+		tempBoard = self.__makeTempBoard(x, y)
+		
 
 		
+	def __makeTempBoard(self, x,y):
+		temp = [] 
+		for row in [-1, 0, 1]:
+			tempRow = []
+			for col in [-1, 0 , 1]:
+				if 0 <= x+row < self.__rowDim and 0<= y+col < self.__colDim:
+					tempRow.append(self.__board[x+row][y+col])  
+			temp.append(tempRow)
+		tempBoard = Board(temp, (x,y))
+		return tempBoard
+				
 		
-		return x, y
 
 
