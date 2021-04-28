@@ -1,0 +1,4 @@
+easy: 86
+medium: 0
+expert: 0
+score: 86

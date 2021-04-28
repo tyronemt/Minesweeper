@@ -75,11 +75,11 @@ class MyAI( AI ):
 		########################################################################
 		self.__tileNumState = number
 		self.__updateGame()
-		print(self.__board)
-		print("Visited: ", self.__visited)
-		print("SafeMoves: ", self.__safeMoves)
-		print("flagCoor: ", self.__flagCoor)
-		print("Bombs ", self.__totalMines)
+		# print(self.__board)
+		# print("Visited: ", self.__visited)
+		# print("SafeMoves: ", self.__safeMoves)
+		# print("flagCoor: ", self.__flagCoor)
+		# print("Bombs ", self.__totalMines)
 		if not self.__isGameOver:
 			self.__findSafeMoves()
 			if (len(self.__safeMoves)):
@@ -140,7 +140,7 @@ class MyAI( AI ):
 		if self.__tileNumState < 0 :
 			self.subtract()
 		self.__totalTiles -= 1
-		if self.__totalMines == self.__totalTiles:
+		if self.__totalMines == self.__totalTiles and self.__totalTiles == 0:
 			self.__isGameOver == True
 
 
@@ -237,16 +237,20 @@ class MyAI( AI ):
 					if (0 <= 1 + row < temp.size and  0 <=  1 + col < len(temp[0])):
 						if (temp[1 + row][1 + col] not in [self.__uncensored, "B", "E", 0]):
 							self.__board[coor[1] + row][coor[0] + col] -= 1
-							print(self.__board)
-							print("Bombs ", self.__totalMines)
+							# print(self.__board)
+							# print("Bombs ", self.__totalMines)
 							if (self.__board[coor[1] + row][coor[0] + col] == 0):
 
 								# I added this because I think this is what you meant
 								currXY = (self.__lastX, self.__lastY)
-								self.__lastX, self.__lastY = (coor[1] + row,coor[0] + col)
-								self.__findSafeMoves()
-								self.__lastX, self.__lastY = currXY
+								currTile = self.__tileNumState
 								
+								self.__lastX, self.__lastY = (coor[0] + col, coor[1] + row)
+								self.__tileNumState = 0 
+								self.__findSafeMoves()
+								
+								self.__lastX, self.__lastY = currXY
+								self.__tileNumState = currTile
 								# self.__safeMoves.append((coor[0] + col,coor[1] + row))
 							else:
 								#                   # toCheck.append((x, y), tileVal) 
