@@ -75,6 +75,11 @@ class MyAI( AI ):
 		########################################################################
 		self.__tileNumState = number
 		self.__updateGame()
+		print(self.__board)
+		print(self.__visited)
+		print(self.__safeMoves)
+		print(self.__flagCoor)
+		print("Bombs ", self.__totalMines)
 		if not self.__isGameOver:
 			self.__findSafeMoves()
 			if (len(self.__safeMoves) != 0):
@@ -88,6 +93,7 @@ class MyAI( AI ):
 					action = AI.Action.FLAG
 					x, y = self.__getMove()
 					self.__visited.append((x, y))
+					self.__totalMines -= 1
 					return Action(action, x, y)
 				else:
 					self.subtract()
@@ -173,8 +179,6 @@ class MyAI( AI ):
 			
 
 
-
-			
 	def __bomb_corr(self, temp_board, middle):
 		bombs = []
 		for row in [-1, 0, 1]:
@@ -186,7 +190,7 @@ class MyAI( AI ):
 
 						
 	def subtract(self):
-		while (self.__visited):
+		while (len(self.__visited) != 0):
 			coor = self.__visited.pop(0)
 			temp = self.__makeTempBoard(coor[0],coor[1])
 			for row in [-1, 0, 1]:
@@ -194,8 +198,12 @@ class MyAI( AI ):
 					if (0 <= 1 + row < temp.size and  0 <=  1 + col < len(temp[0])):
 						if (temp[1 + row][1 + col] not in [self._uncensored, "B", "E", 0]):
 							self.__board[coor[1] + row][coor[0] + col] -= 1
+							print(self.__board)
+							print("Bombs ", self.__totalMines)
 							if (self.__board[coor[1] + row][coor[0] + col] == 0):
 								self.__safeMoves.append((coor[0] + col,coor[1] + row))
+							else:
+								self.__tocheck.append()
 
 
 						
