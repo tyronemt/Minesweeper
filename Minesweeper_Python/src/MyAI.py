@@ -29,7 +29,7 @@ class Board:
 	def __str__(self):
 		s = "\n"
 		for row in self.__board[::-1]:
-			temp = [' ' if i == 0 else str(i)  for i in row[:]]
+			temp = [str(i)  for i in row[:]]
 			s += '  '.join(temp)
 			s += '\n'
 		return s
@@ -57,7 +57,7 @@ class MyAI( AI ):
 		self.__tileNumState = None
 		self.__isGameOver = False
 		self.__safeMoves = []
-		self.__vistedMoves = []
+		self.__tocheck = []
 		self.__flagCoor = []
 		########################################################################
 		#							YOUR CODE ENDS							   #
@@ -73,13 +73,14 @@ class MyAI( AI ):
 		self.__updateGame()
 		if not self.__isGameOver:
 			self.__findSafeMoves()
-			action = AI.Action.UNCOVER
-			x, y = self.__getMove()
-			if x == y == None:
+			if (self.__safeMoves):
+				action = AI.Action.UNCOVER
+				x, y = self.__getMove()
+				# print(self.__board)
+			else:
 				action = AI.Action.FLAG
+				x, y = self.__findBomb()
 
-			# self.__printBoard()
-			# print(self.__board)
 			return Action(action, x, y)
 		else:
 			action = AI.Action.LEAVE
@@ -110,22 +111,10 @@ class MyAI( AI ):
 	def __updateGame(self):
 		self.__board[self.__lastY][self.__lastX] = self.__tileNumState
 		if self.__tileNumState > 0:
-				self.__vistedMoves.append(((self.__lastX,self.__lastY), self.__tileNumState))
+				self.__tocheck.append(((self.__lastX,self.__lastY), self.__tileNumState))
 		self.__totalTiles -= 1
 		if self.__totalMines == self.__totalTiles:
 			self.__isGameOver == True
-
-
-	# def __printBoard(self):
-	# 	''' 
-	# 	For debugging purposes I guess
-	# 	It works now
-	# 	'''
-	# 	print()
-	# 	for row in self.__board[::-1]:
-	# 		temp = [str(i) for i in row[:]]
-	# 		print('  '.join(temp))
-	# 	print()
 
 
 
@@ -148,20 +137,29 @@ class MyAI( AI ):
 
 	def __getMove(self):
 		x = y = 0
-		if len(self.__safeMoves):
-			x, y = self.__safeMoves.pop(0)
-			self.__lastX = x
-			self.__lastY = y
-
-			return x, y
-		else:
-			return None, None
+		x, y = self.__safeMoves.pop(0)
+		self.__lastX = x
+		self.__lastY = y
+		return x, y
 	
 	def __findBomb(self):
+		self.__tocheck.sort(key= lambda x: x[1])
+		while (self.__tocheck):
+			temp = self.__tocheck.pop(0) # ((self.__lastX,self.__lastY), self.__tileNumState)
+			temp_board = self.__makeTempBoard(temp[0][0], temp[0][1])
+			print("-----------------------")
+			print(temp[1])
+			print(str(temp[0][0]), str(temp[0][1]))
+			print(self.__board)
+			print(temp_board)
+			
+
+
+		return 0, 0
 		# Go through each tile and check if the number of uncover tiles in its grid = its tile number
 		# if so the remaining tiles are bombs and should be flagged
 		# save all the flag x,y coor
-		pass
+		
 		
 		
 				
@@ -174,8 +172,8 @@ class MyAI( AI ):
 		for row in [-1, 0, 1]:
 			tempRow = []
 			for col in [-1, 0 , 1]:
-				if 0 <= x+row < self.__rowDim and 0<= y+col < self.__colDim:
-					tempRow.append(self.__board[x+row][y+col])  
+				if 0 <= x+row < self.__rowDim and 0 <= y+col < self.__colDim:
+					tempRow.append(self.__board[y+row][x+col])  
 			temp.append(tempRow)
 		tempBoard = Board(temp, (x,y))
 		return tempBoard
