@@ -133,15 +133,24 @@ class MyAI( AI ):
 		# self.__board[self.__lastY][self.__lastX] = self.__tileNumState
 		# if self.__tileNumState != 'B' and self.__tileNumState > 0:
 		# 		self.__tocheck.append(((self.__lastX,self.__lastY), self.__tileNumState))
-		
+		if self.__tileNumState > 0:
+			for row in [-1, 0, 1]:
+					for col in [-1, 0, 1]:
+						if not (row == col == 0) \
+						and 0 <= self.__lastX+row < self.__rowDim and 0 <= self.__lastY+col < self.__colDim \
+						and self.__getTileAt(self.__lastX+row, self.__lastY+col) == "B":
+							self.__tileNumState -= 1
+
 		self.__board[self.__lastY][self.__lastX] = self.__tileNumState if self.__tileNumState >-1 else 'B'
 		if self.__tileNumState > 0:
 				self.__tocheck.append(((self.__lastX,self.__lastY), self.__tileNumState))
+
 		if self.__tileNumState < 0 :
 			self.subtract()
 		self.__totalTiles -= 1
 		if self.__totalMines == self.__totalTiles and self.__totalTiles == 0:
 			self.__isGameOver == True
+		
 
 
 
