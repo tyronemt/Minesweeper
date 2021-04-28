@@ -101,8 +101,8 @@ class World():
 						break
 			except ValueError:
 				print("Error: Invalid action!")
-			except IndexError:
-				print("Error: Move is out of bounds!")
+			# except IndexError:
+			# 	print("Error: Move is out of bounds!")
 
 			if self.__debug and type(self.__ai) != ManualAI:
 				input("Press ENTER to continue...")
@@ -132,6 +132,7 @@ class World():
 		move = actionObj.getMove()
 		X = actionObj.getX()
 		Y = actionObj.getY()
+		
 		if move in [AI.Action.LEAVE, AI.Action.UNCOVER, AI.Action.FLAG, AI.Action.UNFLAG]:
 			if self.__isInBounds(X, Y):
 				return True
@@ -147,6 +148,7 @@ class World():
 		move = actionObj.getMove()
 		X = actionObj.getX()
 		Y = actionObj.getY()
+		
 		self.__lastTile = (X+1, Y+1)
 		if move == AI.Action.UNCOVER:
 			self.__lastAction = "UNCOVER"
