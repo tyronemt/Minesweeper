@@ -1,4 +1,4 @@
-easy: 86
+easy: 0
 medium: 0
 expert: 0
-score: 86
+score: 0
