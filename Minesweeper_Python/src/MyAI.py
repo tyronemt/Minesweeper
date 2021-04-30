@@ -142,14 +142,16 @@ class MyAI( AI ):
 							self.__tileNumState -= 1
 
 		self.__board[self.__lastY][self.__lastX] = self.__tileNumState if self.__tileNumState >-1 else 'B'
+		
 		if self.__tileNumState > 0:
 				self.__tocheck.append(((self.__lastX,self.__lastY), self.__tileNumState))
 
 		if self.__tileNumState < 0 :
 			self.subtract()
+
 		self.__totalTiles -= 1
-		if self.__totalMines == self.__totalTiles and self.__totalTiles == 0:
-			self.__isGameOver == True
+		if self.__totalMines == self.__totalTiles:
+			self.__isGameOver = True
 		
 
 
