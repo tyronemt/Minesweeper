@@ -103,8 +103,8 @@ class MyAI( AI ):
 		self.__isGameOver = False
 		self.__safeMoves = []
 		self.__tocheck = []
-		self.__flagCoor = []
-		self.__visited = []
+		self.__flagCoor = set()
+		self.__visited = set()
 		
 		########################################################################
 		#							YOUR CODE ENDS							   #
@@ -136,7 +136,7 @@ class MyAI( AI ):
 				if (len(self.__flagCoor)):
 					action = AI.Action.FLAG
 					x, y = self.__getMove()
-					self.__visited.append((x, y))
+					self.__visited.add((x, y))
 					return Action(action, x, y)
 
 				else:
@@ -197,7 +197,7 @@ class MyAI( AI ):
 		if (self.__safeMoves):
 			x, y = self.__safeMoves.pop(0)
 		elif(self.__flagCoor):
-			x, y = self.__flagCoor.pop(0)
+			x, y = self.__flagCoor.pop()
 		self.__lastX = x
 		self.__lastY = y
 		return x, y
@@ -223,15 +223,15 @@ class MyAI( AI ):
 			wasBomb = True
 			for coor in emptyCoor:
 				if self.__board.getTileAt( coor[0], coor[1]) == self.__board.cover:
-					self.__flagCoor.append(coor)
+					self.__flagCoor.add(coor)
 		return wasBomb
 
 						
 	def subtract(self):
 		while (len(self.__visited)):
-			coor = self.__visited.pop(0)
+			coor = self.__visited.pop()
 			for xTemp, yTemp, val in self.__board.iterAt(coor[0], coor[1]):
-				if not self.__board.isBombAt(xTemp, yTemp) and not self.__board.isCoveredAt(xTemp,yTemp) and val>0:
+				if not self.__board.isBombAt(xTemp, yTemp) and not self.__board.isCoveredAt(xTemp,yTemp) :
 					self.__board.decTileAt(xTemp, yTemp, 1)
 					newVal = self.__board.getTileAt(xTemp,yTemp) 
 					if newVal == 0:
