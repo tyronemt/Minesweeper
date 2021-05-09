@@ -13,6 +13,8 @@
 # ==============================CS-199==================================
 from AI import AI
 from Action import Action
+import numpy as np
+from collections import defaultdict
 
 class Board:
 	def __init__(self, row, col, totalMines, currentXY, cover = '.', bomb = 'B'):
@@ -60,8 +62,8 @@ class Board:
 		for row in [-1, 0, 1]:
 			for col in [-1, 0, 1]:
 				if not (row == col == 0)\
-				and 0 <= x+row < self.rowDim\
-				and 0 <= y+col < self.colDim:
+				and 0 <= x+row < self.colDim\
+				and 0 <= y+col < self.rowDim:
 					val = self.getTileAt(x+row, y+col)
 					if match == None:
 						yield x+row, y+col, val
@@ -69,6 +71,17 @@ class Board:
 						if match == val:
 							yield x+row, y+col, val
 
+	def iterBoard(self, match = None):
+		for col in self.colDim:
+			for row in self.rowDim:
+				if  0 <= x+col < self.colDim\
+				and 0 <= y+row < self.rowDim:
+					val = self.getTileAt(x+col, y+row)
+					if match == None:
+						yield x+col, y+row, val
+					else:
+						if match == val:
+							yield x+col, y+row, val
 
 
 	def isBombAt(self, x, y):
@@ -105,6 +118,8 @@ class MyAI( AI ):
 		self.__tocheck = []
 		self.__flagCoor = set()
 		self.__visited = set()
+		self.__finishedMoves = set()
+		self.__coveredATiles = set()
 		
 		########################################################################
 		#							YOUR CODE ENDS							   #
@@ -118,7 +133,7 @@ class MyAI( AI ):
 		########################################################################
 		self.__tileNumState = number
 		self.__updateGame()
-		print(self.__board)
+		# print(self.__board)
 		# print("Visited: ", self.__visited)
 		# print("SafeMoves: ", self.__safeMoves)
 		# print("flagCoor: ", self.__flagCoor)
@@ -128,19 +143,19 @@ class MyAI( AI ):
 			if (len(self.__safeMoves)):
 				action = AI.Action.UNCOVER
 				x, y = self.__getMove()
-				# print(x,y)
+				self.__finishedMoves.add((x,y))
 				return Action(action, x, y)
 
+			self.__findBomb()
+			if (len(self.__flagCoor)):
+				action = AI.Action.FLAG
+				x, y = self.__getMove()
+				self.__visited.add((x, y))
+				self.__finishedMoves.add((x,y))
+				return Action(action, x, y)
 			else:
-				self.__findBomb()
-				if (len(self.__flagCoor)):
-					action = AI.Action.FLAG
-					x, y = self.__getMove()
-					self.__visited.add((x, y))
-					return Action(action, x, y)
+				pass
 
-				else:
-					pass
 			
 		else:
 			action = AI.Action.LEAVE
@@ -238,3 +253,33 @@ class MyAI( AI ):
 						self.__findSafeMoves(xTemp, yTemp)
 					else:
 						self.__tocheck.append((xTemp, yTemp))
+
+
+
+	def getCoveredTiles(self):
+		for x,y, tile in self.__board.iterBoard():
+			if tile not in [self.__board.cover, self.__board.bomb] and tile > 0:
+				self.__numberedTiles.add((x,y))	
+		for x,y, tile in self.__board.iterBoard(self.__board.cover):
+			self.__coveredTiles.add((x,y))	
+
+	def computeProbability(self):
+		tempValues = defaultdict(lambda: 0.00) # ((x,y), val = probability)
+		tempBoard = Board(self.__board.rowDim, self.__board.colDim)
+
+		while (1):
+			x,y = self.__numberedTiles.pop()
+			count = 0 
+			for tempX, tempY, tile in self.__board.iterAt(x,y, self.__board.cover):
+				count += 1
+			
+			for tempX, tempY, tile in self.__board.iterAt(x,y, self.__board.cover):
+				tempValues[(tempX, tempY)] += self.__board.getTileAt(x,y)/(count)
+
+		tempList = tempValues.items()
+		tempList.sort(key = lambda x: x[1])
+		return tempList[0]
+
+				
+		pass
+	
