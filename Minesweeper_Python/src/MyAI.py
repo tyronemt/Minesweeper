@@ -62,19 +62,7 @@ class Board:
 		for row in [-1, 0, 1]:
 			for col in [-1, 0, 1]:
 				if not (row == col == 0)\
-				and 0 <= x+row < self.colDim\
-				and 0 <= y+col < self.rowDim:
-					val = self.getTileAt(x+row, y+col)
-					if match == None:
-						yield x+row, y+col, val
-					else:
-						if match == val:
-							yield x+row, y+col, val
-
-	def iterBoard(self, match = None):
-		for col in self.colDim:
-			for row in self.rowDim:
-				if  0 <= x+col < self.colDim\
+				and 0 <= x+col < self.colDim\
 				and 0 <= y+row < self.rowDim:
 					val = self.getTileAt(x+col, y+row)
 					if match == None:
@@ -82,6 +70,16 @@ class Board:
 					else:
 						if match == val:
 							yield x+col, y+row, val
+
+	def iterBoard(self, match = None):
+		for col in range(self.colDim):
+			for row in range(self.rowDim):
+				val = self.getTileAt(col, row)
+				if match == None:
+					yield col, row, val
+				else:
+					if match == val:
+						yield col, row, val
 
 
 	def isBombAt(self, x, y):
@@ -120,6 +118,9 @@ class MyAI( AI ):
 		self.__visited = set()
 		self.__finishedMoves = set()
 		self.__coveredATiles = set()
+		self.__numberedTiles = set()
+		self.__coveredTiles = set()
+		self.__totalMines = totalMines
 		
 		########################################################################
 		#							YOUR CODE ENDS							   #
@@ -138,6 +139,10 @@ class MyAI( AI ):
 		# print("SafeMoves: ", self.__safeMoves)
 		# print("flagCoor: ", self.__flagCoor)
 		# print("Bombs ", self.__totalMines)
+		if (self.__board.totalMines + self.__totalMines == 0):
+			for i in self.__board.iterBoard(self.__board.cover):
+				self.__safeMoves.append((i[0],i[1]))
+				
 		if not self.__isGameOver:
 			self.__findSafeMoves(self.__lastX, self.__lastY)
 			if (len(self.__safeMoves)):
@@ -152,9 +157,15 @@ class MyAI( AI ):
 				x, y = self.__getMove()
 				self.__visited.add((x, y))
 				self.__finishedMoves.add((x,y))
+				self.__board.totalMines -= 1
 				return Action(action, x, y)
 			else:
-				pass
+				self.__lastX, self.__lastY = self.computeProbability()
+				action = AI.Action.UNCOVER
+				return Action(action, self.__lastX, self.__lastY)
+
+			
+			
 
 			
 		else:
@@ -181,20 +192,22 @@ class MyAI( AI ):
 	##		         ----------------				   ##
 	#####################################################
 	def __updateGame(self):
+		
 		if self.__tileNumState > 0:
 			for x_temp, y_temp, val in self.__board.iterAt(self.__lastX, self.__lastY, match = self.__board.bomb):
 				self.__tileNumState -= 1
 
 		
 		self.__board.setTileAt(self.__lastX, self.__lastY, self.__tileNumState)
-		if self.__tileNumState > 0:
+		if self.__tileNumState > 0:									
 				self.__tocheck.append((self.__lastX,self.__lastY))
 
-		if self.__tileNumState < 0 :
+		if self.__tileNumState < 0:
 			self.subtract()
 
 		if self.__board.totalTiles == 0:
 			self.__isGameOver = True
+		
 		
 
 
@@ -264,22 +277,25 @@ class MyAI( AI ):
 			self.__coveredTiles.add((x,y))	
 
 	def computeProbability(self):
-		tempValues = defaultdict(lambda: 0.00) # ((x,y), val = probability)
-		tempBoard = Board(self.__board.rowDim, self.__board.colDim)
+		tempValues = defaultdict(lambda: 0.00) # {(x,y): probability}
+		tempBoard = Board(self.__board.rowDim, self.__board.colDim, self.__board.totalMines, (0,0))
+		self.getCoveredTiles()
+		if (self.__numberedTiles):
+			while (self.__numberedTiles):
+				x,y = self.__numberedTiles.pop()
+				count = 0 
+				for tempX, tempY, tile in self.__board.iterAt(x,y, self.__board.cover):
+					count += 1
+				
+				for tempX, tempY, tile in self.__board.iterAt(x,y, self.__board.cover):
+					tempValues[(tempX, tempY)] += self.__board.getTileAt(x,y)/(count)
 
-		while (1):
-			x,y = self.__numberedTiles.pop()
-			count = 0 
-			for tempX, tempY, tile in self.__board.iterAt(x,y, self.__board.cover):
-				count += 1
-			
-			for tempX, tempY, tile in self.__board.iterAt(x,y, self.__board.cover):
-				tempValues[(tempX, tempY)] += self.__board.getTileAt(x,y)/(count)
-
-		tempList = tempValues.items()
-		tempList.sort(key = lambda x: x[1])
-		return tempList[0]
+			tempList = tempValues.items()
+			tempList = sorted(tempList, key = lambda x: x[1])
+			return tempList[0][0]
+		else:
+			for i in self.__board.iterBoard(self.__board.cover):
+				return (i[0],i[1])
 
 				
-		pass
 	
