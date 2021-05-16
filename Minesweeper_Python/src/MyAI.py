@@ -13,7 +13,6 @@
 # ==============================CS-199==================================
 from AI import AI
 from Action import Action
-import numpy as np
 from collections import defaultdict
 
 class Board:
@@ -118,9 +117,10 @@ class MyAI( AI ):
 		self.__visited = set()
 		self.__finishedMoves = set()
 		self.__coveredATiles = set()
-		self.__numberedTiles = set()
-		self.__coveredTiles = set()
+		# self.__numberedTiles = set()
+		# self.__coveredTiles = set()
 		self.__totalMines = totalMines
+		
 		
 		########################################################################
 		#							YOUR CODE ENDS							   #
@@ -139,10 +139,7 @@ class MyAI( AI ):
 		# print("SafeMoves: ", self.__safeMoves)
 		# print("flagCoor: ", self.__flagCoor)
 		# print("Bombs ", self.__totalMines)
-		if (self.__board.totalMines + self.__totalMines == 0):
-			for i in self.__board.iterBoard(self.__board.cover):
-				self.__safeMoves.append((i[0],i[1]))
-				
+		# if (self.__board.totalMines + self.__totalMines == 0):				
 		if not self.__isGameOver:
 			self.__findSafeMoves(self.__lastX, self.__lastY)
 			if (len(self.__safeMoves)):
@@ -157,17 +154,13 @@ class MyAI( AI ):
 				x, y = self.__getMove()
 				self.__visited.add((x, y))
 				self.__finishedMoves.add((x,y))
-				self.__board.totalMines -= 1
+				# self.__board.totalMines -= 1
 				return Action(action, x, y)
 			else:
-				self.__lastX, self.__lastY = self.computeProbability()
+				self.__lastX, self.__lastY = self.__getMoveProb()
 				action = AI.Action.UNCOVER
 				return Action(action, self.__lastX, self.__lastY)
-
-			
-			
-
-			
+				
 		else:
 			action = AI.Action.LEAVE
 			return Action(action)
@@ -175,7 +168,7 @@ class MyAI( AI ):
 			
 			
 
-		return Action(AI.Action.LEAVE)
+		# return Action(AI.Action.LEAVE)
 		########################################################################
 		#							YOUR CODE ENDS							   #
 		########################################################################
@@ -192,7 +185,6 @@ class MyAI( AI ):
 	##		         ----------------				   ##
 	#####################################################
 	def __updateGame(self):
-		
 		if self.__tileNumState > 0:
 			for x_temp, y_temp, val in self.__board.iterAt(self.__lastX, self.__lastY, match = self.__board.bomb):
 				self.__tileNumState -= 1
@@ -218,6 +210,11 @@ class MyAI( AI ):
 				if (xTemp, yTemp) not in self.__safeMoves:
 					self.__safeMoves.append((xTemp, yTemp))
 
+		if (self.__board.totalMines == 0):	
+			for x, y, val in self.__board.iterBoard(self.__board.cover):
+				if (x,y) not in self.__safeMoves:
+					self.__safeMoves.append((x,y))
+
 
 
 	def __getMove(self):
@@ -232,8 +229,9 @@ class MyAI( AI ):
 	
 
 	def __findBomb(self):
-		self.__tocheck.sort(key= lambda coor: self.__board.getTileAt(coor[0], coor[1]))
-		for temp in self.__tocheck[:]:
+		# self.__tocheck.sort(key= lambda coor: self.__board.getTileAt(coor[0], coor[1]))
+		tempCopy = sorted(self.__tocheck, key= lambda coor: self.__board.getTileAt(coor[0], coor[1]))
+		for temp in tempCopy[:]:
 			wasBomb = self.__markBombs(temp)
 			if wasBomb:
 				self.__tocheck.remove(temp)
@@ -269,20 +267,30 @@ class MyAI( AI ):
 
 
 
-	def getCoveredTiles(self):
-		for x,y, tile in self.__board.iterBoard():
-			if tile not in [self.__board.cover, self.__board.bomb] and tile > 0:
-				self.__numberedTiles.add((x,y))	
-		for x,y, tile in self.__board.iterBoard(self.__board.cover):
-			self.__coveredTiles.add((x,y))	
+	# def getCoveredTiles(self):
+	# 	numberedTiles = set()
+	# 	for x,y, tile in self.__board.iterBoard():
+	# 		if tile not in [self.__board.cover, self.__board.bomb] and tile > 0:
+	# 			numberedTiles.add((x,y))	
+	# 	return numberedTiles
+		# for x,y, tile in self.__board.iterBoard(self.__board.cover):
+		# 	coveredTiles.add((x,y))	
 
-	def computeProbability(self):
+	def __getMoveProb(self):
 		tempValues = defaultdict(lambda: 0.00) # {(x,y): probability}
-		tempBoard = Board(self.__board.rowDim, self.__board.colDim, self.__board.totalMines, (0,0))
-		self.getCoveredTiles()
-		if (self.__numberedTiles):
-			while (self.__numberedTiles):
-				x,y = self.__numberedTiles.pop()
+		# tempBoard = Board(self.__board.rowDim, self.__board.colDim, self.__board.totalMines, (0,0))
+		# self.getCoveredTiles()
+		# if (set(self.__tocheck) != self.__numberedTiles):
+		# 	print(self.__board)
+		# 	print("Numbered: ", self.__numberedTiles)
+		# 	print("toCheck: ", self.__tocheck)
+		 
+		# numberedTiles and toCheck contain the same values
+		numberedTiles = set(self.__tocheck)
+		# numberedTiles = self.getCoveredTiles()
+		if (numberedTiles): 
+			while (len(numberedTiles)):
+				x,y = numberedTiles.pop()
 				count = 0 
 				for tempX, tempY, tile in self.__board.iterAt(x,y, self.__board.cover):
 					count += 1
@@ -292,8 +300,9 @@ class MyAI( AI ):
 
 			tempList = tempValues.items()
 			tempList = sorted(tempList, key = lambda x: x[1])
-			return tempList[0][0]
+			return tempList[0][0] 
 		else:
+			# print(self.__board)
 			for i in self.__board.iterBoard(self.__board.cover):
 				return (i[0],i[1])
 
