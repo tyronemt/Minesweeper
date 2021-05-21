@@ -14,6 +14,8 @@
 from AI import AI
 from Action import Action
 from collections import defaultdict
+import random
+
 
 class Board:
 	def __init__(self, row, col, totalMines, currentXY, cover = '.', bomb = 'B'):
@@ -97,15 +99,6 @@ class MyAI( AI ):
 		########################################################################
 		#							YOUR CODE BEGINS						   #
 		########################################################################
-		
-		# Test by using:
-		#		py main.py -d
-		# self.__rowDim = rowDimension
-		# self.__colDim = colDimension
-		# self.__totalTiles = rowDimension * colDimension
-		# self.__uncensored = "."
-		# self.__bomb = 'B'
-		# self.__board = [['N' for i in range(self.__colDim)] for j in range(self.__rowDim)]  # Not sure whether to keep this
 		self.__board = Board(rowDimension, colDimension, totalMines, (startX, startY))
 		self.__lastX = startX
 		self.__lastY = startY
@@ -116,9 +109,6 @@ class MyAI( AI ):
 		self.__flagCoor = set()
 		self.__visited = set()
 		self.__finishedMoves = set()
-		self.__coveredATiles = set()
-		# self.__numberedTiles = set()
-		# self.__coveredTiles = set()
 		self.__totalMines = totalMines
 		
 		
@@ -267,27 +257,10 @@ class MyAI( AI ):
 
 
 
-	# def getCoveredTiles(self):
-	# 	numberedTiles = set()
-	# 	for x,y, tile in self.__board.iterBoard():
-	# 		if tile not in [self.__board.cover, self.__board.bomb] and tile > 0:
-	# 			numberedTiles.add((x,y))	
-	# 	return numberedTiles
-		# for x,y, tile in self.__board.iterBoard(self.__board.cover):
-		# 	coveredTiles.add((x,y))	
 
 	def __getMoveProb(self):
 		tempValues = defaultdict(lambda: 0.00) # {(x,y): probability}
-		# tempBoard = Board(self.__board.rowDim, self.__board.colDim, self.__board.totalMines, (0,0))
-		# self.getCoveredTiles()
-		# if (set(self.__tocheck) != self.__numberedTiles):
-		# 	print(self.__board)
-		# 	print("Numbered: ", self.__numberedTiles)
-		# 	print("toCheck: ", self.__tocheck)
-		 
-		# numberedTiles and toCheck contain the same values
 		numberedTiles = set(self.__tocheck)
-		# numberedTiles = self.getCoveredTiles()
 		if (numberedTiles): 
 			while (len(numberedTiles)):
 				x,y = numberedTiles.pop()
@@ -300,11 +273,27 @@ class MyAI( AI ):
 
 			tempList = tempValues.items()
 			tempList = sorted(tempList, key = lambda x: x[1])
-			return tempList[0][0] 
+
+			smallest = tempList[0][1]
+			anotherTempList = set()
+
+			for ele in tempList:
+				if ele[1] == smallest:
+					anotherTempList.add(ele[0])
+				else:
+					break
+			return anotherTempList.pop()
+
+
 		else:
 			# print(self.__board)
+	
 			for i in self.__board.iterBoard(self.__board.cover):
 				return (i[0],i[1])
-
-				
+			
+			# coveredTiles = [(x,y) for x,y, val in self.__board.iterBoard(self.__board.cover)]
+			# return coveredTiles[random.randint(0, len(coveredTiles)-1)]
+			
+			# coveredTiles = set([(x,y) for x,y, val in self.__board.iterBoard(self.__board.cover)])
+			# return (coveredTiles.pop())
 	
