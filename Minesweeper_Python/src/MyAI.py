@@ -1,3 +1,4 @@
+
 # ==============================CS-199==================================
 # FILE:			MyAI.py
 #
@@ -45,7 +46,10 @@ class Board:
 
 
 	def getTileAt(self, x, y):
-		return self.__board[y][x]
+		if  0 <= x < self.colDim and 0 <= y < self.rowDim:
+			return self.__board[y][x]
+		else:
+			return None
 
 	def incTileAt(self, x, y, val):
 		self.__board[y][x] += val
@@ -88,6 +92,94 @@ class Board:
 	
 	def isCoveredAt(self, x, y):
 		return self.getTileAt(x,y) == self.cover
+
+
+	# def neighborsSide(self, x, y, sides, keys, allneighbors = False):
+	# 	iteration  = [-1, 0, 1] if allneighbors else [0]
+	# 	for i in iteration:
+	# 		if "right" in sides:
+	# 			if self.getTileAt(x+1, y+i) not in keys:
+	# 				return False
+			
+	# 		if "left" in sides:
+	# 			if self.getTileAt(x-1, y+i) not in keys:
+	# 				return False
+			
+	# 		if "up" in sides:
+	# 			if self.getTileAt(x+i, y+1) not in keys:
+	# 				return False
+			
+	# 		if "down" in sides:
+	# 			if self.getTileAt(x+i, y-1) not in keys:
+	# 				return False
+	# 	return True
+
+	# def neighborsLessThan(self, x, y, sides, val, allneighbors = False):
+	# 	iteration  = [-1, 0, 1] if allneighbors else [0]
+	# 	for i in iteration:
+	# 		if "right" in sides:
+	# 			tileNum = self.getTileAt(x+1, y+i)
+	# 			if tileNum == self.cover :
+	# 				return False
+	# 			if type(tileNum) == int and tileNum >= val:
+	# 				return False
+			
+	# 		if "left" in sides:
+	# 			tileNum = self.getTileAt(x-1, y+i)
+	# 			if tileNum == self.cover :
+	# 				return False
+	# 			if type(tileNum) == int and tileNum >= val:
+	# 				return False
+			
+	# 		if "up" in sides:
+	# 			tileNum = self.getTileAt(x+i, y+1)
+	# 			if tileNum == self.cover :
+	# 				return False
+	# 			if type(tileNum) == int and tileNum >= val:
+	# 				return False
+			
+	# 		if "down" in sides:
+	# 			tileNum = self.getTileAt(x+i, y-1)
+	# 			if tileNum == self.cover:
+	# 				return False
+	# 			if type(tileNum) == int and tileNum >= val:
+	# 				return False
+	# 	return True
+
+
+
+
+	def getNeighbors(self, x, y, sides, keys, allneighbors = False):
+		neighbors = set()
+		iteration = [-1, 0, 1] if allneighbors else [0]
+		if "right" in sides:
+			for i in iteration:
+				x1, y1 = x+1, y+i
+				if self.getTileAt(x1, y1) != None and self.getTileAt(x1, y1)  in keys:
+					neighbors.add((x1,y1))
+			
+		if "left" in sides:	
+			for i in iteration:
+				x1, y1 = x-1, y+i
+				if self.getTileAt(x1, y1) != None and self.getTileAt(x1, y1)  in keys:
+					neighbors.add((x1,y1))
+		
+		if "up" in sides:	
+			for i in iteration:	
+				x1, y1 = x+i, y+1
+				if self.getTileAt(x1, y1) != None and self.getTileAt(x1, y1)  in keys:
+					neighbors.add((x1,y1))
+
+		if "down" in sides:	
+			for i in iteration:
+				x1, y1 = x+i, y-1
+				if self.getTileAt(x1, y1) != None and self.getTileAt(x1, y1)  in keys:
+					neighbors.add((x1,y1))
+
+
+		return neighbors
+
+
 
 
 
@@ -152,6 +244,7 @@ class MyAI( AI ):
 				return Action(action, self.__lastX, self.__lastY)
 				
 		else:
+			# print(self.__isGameOver)
 			action = AI.Action.LEAVE
 			return Action(action)
 
@@ -204,6 +297,88 @@ class MyAI( AI ):
 			for x, y, val in self.__board.iterBoard(self.__board.cover):
 				if (x,y) not in self.__safeMoves:
 					self.__safeMoves.append((x,y))
+
+
+
+
+
+
+
+
+
+
+
+
+		if not len(self.__safeMoves) and not len(self.__flagCoor):
+			posOnes = set([(xPos,yPos) for (xPos,yPos) in self.__tocheck if self.__board.getTileAt(xPos,yPos) == 1])
+			pairs = set()
+			while (posOnes):
+				x, y = posOnes.pop()
+				neighborsOnes = self.__board.getNeighbors(x, y, sides = {"right", "left", "up", "down"}, keys = {1}, allneighbors=True)
+				# neighborsOnes = set([(xt, yt) for (xt,yt,val) in self.__board.iterAt(x, y, match=1)])
+				xyCovers = self.__board.getNeighbors(x, y, sides = {"right", "left", "up", "down"}, keys = {self.__board.cover}, allneighbors=True)
+				# xyCovers = set([(xt, yt) for (xt,yt,val) in self.__board.iterAt(x, y, match=self.__board.cover)])
+				for neighbor in neighborsOnes:
+					nX, nY = neighbor
+					neighborCovers = self.__board.getNeighbors(nX, nY,sides = {"right", "left", "up", "down"}, keys= {self.__board.cover}, allneighbors=True)
+					# neighborCovers = set([(xt, yt) for (xt,yt,val) in self.__board.iterAt(nX, nY, match=self.__board.cover)])
+					if len(xyCovers) and len(neighborCovers) and ((x,y), (nX,nY)) not in pairs:
+						pairs.add(  ((nX,nY), (x,y))  )
+						pairs.add(  ((x,y), (nX,nY))  )
+
+						if len(xyCovers) > len(neighborCovers) and neighborCovers.issubset(xyCovers):
+							for coor in (xyCovers - neighborCovers):
+								if coor not in self.__safeMoves:
+									self.__safeMoves.append(coor)
+						elif len(xyCovers) < len(neighborCovers) and xyCovers.issubset(neighborCovers):
+							for coor in (neighborCovers - xyCovers):
+								if coor not in self.__safeMoves:
+									self.__safeMoves.append(coor)
+
+
+
+
+
+
+		if not len(self.__safeMoves) and not len(self.__flagCoor):
+			posTwos = set([(xPos,yPos) for (xPos,yPos) in self.__tocheck if self.__board.getTileAt(xPos,yPos) == 2])
+			while (posTwos):
+				x, y = posTwos.pop()
+				safeSet = set()
+				# horizontal
+				rXYs = self.__board.getNeighbors(x, y, sides= {"right"}, keys={1})
+				lXYs = self.__board.getNeighbors(x, y, sides= {"left"}, keys={1})
+				if len(rXYs) and len(lXYs):
+					rX, rY = rXYs.pop()
+					lX, lY = lXYs.pop()
+					
+					if self.__board.getTileAt(rX, rY) == self.__board.getTileAt(lX, lY) == 1:
+						safeSet = safeSet.union(self.__board.getNeighbors(rX, rY, sides = {"right"}, keys= {self.__board.cover}, allneighbors=True))
+						safeSet = safeSet.union(self.__board.getNeighbors(lX, lY, sides = {"left"}, keys= {self.__board.cover}, allneighbors=True))
+						safeSet = safeSet.union(self.__board.getNeighbors(x, y, sides= {"up", "down"}, keys={self.__board.cover}))
+
+				# vertial
+				uXYs = self.__board.getNeighbors(x, y, sides= {"up"}, keys={1})
+				dXYs = self.__board.getNeighbors(x, y, sides= {"down"}, keys={1})
+				if len(uXYs) and len(dXYs):
+					uX, uY = uXYs.pop()
+					dX, dY = dXYs.pop()
+					if self.__board.getTileAt(uX, uY) == self.__board.getTileAt(dX, dY) == 1:
+						safeSet = safeSet.union(self.__board.getNeighbors(uX, uY, sides = {"up"}, keys= {self.__board.cover}, allneighbors=True))
+						safeSet = safeSet.union(self.__board.getNeighbors(dX, dY, sides = {"down"}, keys= {self.__board.cover}, allneighbors=True))
+						safeSet = safeSet.union(self.__board.getNeighbors(x, y, sides= {"left", "right"}, keys={self.__board.cover}))
+				# print(safeSet)
+				for coor in safeSet:
+					if coor not in self.__safeMoves:
+						self.__safeMoves.append(coor)
+
+
+
+
+
+
+
+
 
 
 
