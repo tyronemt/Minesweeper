@@ -94,58 +94,6 @@ class Board:
 		return self.getTileAt(x,y) == self.cover
 
 
-	# def neighborsSide(self, x, y, sides, keys, allneighbors = False):
-	# 	iteration  = [-1, 0, 1] if allneighbors else [0]
-	# 	for i in iteration:
-	# 		if "right" in sides:
-	# 			if self.getTileAt(x+1, y+i) not in keys:
-	# 				return False
-			
-	# 		if "left" in sides:
-	# 			if self.getTileAt(x-1, y+i) not in keys:
-	# 				return False
-			
-	# 		if "up" in sides:
-	# 			if self.getTileAt(x+i, y+1) not in keys:
-	# 				return False
-			
-	# 		if "down" in sides:
-	# 			if self.getTileAt(x+i, y-1) not in keys:
-	# 				return False
-	# 	return True
-
-	# def neighborsLessThan(self, x, y, sides, val, allneighbors = False):
-	# 	iteration  = [-1, 0, 1] if allneighbors else [0]
-	# 	for i in iteration:
-	# 		if "right" in sides:
-	# 			tileNum = self.getTileAt(x+1, y+i)
-	# 			if tileNum == self.cover :
-	# 				return False
-	# 			if type(tileNum) == int and tileNum >= val:
-	# 				return False
-			
-	# 		if "left" in sides:
-	# 			tileNum = self.getTileAt(x-1, y+i)
-	# 			if tileNum == self.cover :
-	# 				return False
-	# 			if type(tileNum) == int and tileNum >= val:
-	# 				return False
-			
-	# 		if "up" in sides:
-	# 			tileNum = self.getTileAt(x+i, y+1)
-	# 			if tileNum == self.cover :
-	# 				return False
-	# 			if type(tileNum) == int and tileNum >= val:
-	# 				return False
-			
-	# 		if "down" in sides:
-	# 			tileNum = self.getTileAt(x+i, y-1)
-	# 			if tileNum == self.cover:
-	# 				return False
-	# 			if type(tileNum) == int and tileNum >= val:
-	# 				return False
-	# 	return True
-
 
 
 
@@ -216,12 +164,7 @@ class MyAI( AI ):
 		########################################################################
 		self.__tileNumState = number
 		self.__updateGame()
-		# print(self.__board)
-		# print("Visited: ", self.__visited)
-		# print("SafeMoves: ", self.__safeMoves)
-		# print("flagCoor: ", self.__flagCoor)
-		# print("Bombs ", self.__totalMines)
-		# if (self.__board.totalMines + self.__totalMines == 0):				
+			
 		if not self.__isGameOver:
 			self.__findSafeMoves(self.__lastX, self.__lastY)
 			if (len(self.__safeMoves)):
@@ -244,14 +187,13 @@ class MyAI( AI ):
 				return Action(action, self.__lastX, self.__lastY)
 				
 		else:
-			# print(self.__isGameOver)
 			action = AI.Action.LEAVE
 			return Action(action)
 
 			
 			
 
-		# return Action(AI.Action.LEAVE)
+
 		########################################################################
 		#							YOUR CODE ENDS							   #
 		########################################################################
@@ -315,13 +257,10 @@ class MyAI( AI ):
 			while (posOnes):
 				x, y = posOnes.pop()
 				neighborsOnes = self.__board.getNeighbors(x, y, sides = {"right", "left", "up", "down"}, keys = {1}, allneighbors=True)
-				# neighborsOnes = set([(xt, yt) for (xt,yt,val) in self.__board.iterAt(x, y, match=1)])
 				xyCovers = self.__board.getNeighbors(x, y, sides = {"right", "left", "up", "down"}, keys = {self.__board.cover}, allneighbors=True)
-				# xyCovers = set([(xt, yt) for (xt,yt,val) in self.__board.iterAt(x, y, match=self.__board.cover)])
 				for neighbor in neighborsOnes:
 					nX, nY = neighbor
 					neighborCovers = self.__board.getNeighbors(nX, nY,sides = {"right", "left", "up", "down"}, keys= {self.__board.cover}, allneighbors=True)
-					# neighborCovers = set([(xt, yt) for (xt,yt,val) in self.__board.iterAt(nX, nY, match=self.__board.cover)])
 					if len(xyCovers) and len(neighborCovers) and ((x,y), (nX,nY)) not in pairs:
 						pairs.add(  ((nX,nY), (x,y))  )
 						pairs.add(  ((x,y), (nX,nY))  )
@@ -367,7 +306,6 @@ class MyAI( AI ):
 						safeSet = safeSet.union(self.__board.getNeighbors(uX, uY, sides = {"up"}, keys= {self.__board.cover}, allneighbors=True))
 						safeSet = safeSet.union(self.__board.getNeighbors(dX, dY, sides = {"down"}, keys= {self.__board.cover}, allneighbors=True))
 						safeSet = safeSet.union(self.__board.getNeighbors(x, y, sides= {"left", "right"}, keys={self.__board.cover}))
-				# print(safeSet)
 				for coor in safeSet:
 					if coor not in self.__safeMoves:
 						self.__safeMoves.append(coor)
@@ -461,14 +399,7 @@ class MyAI( AI ):
 
 
 		else:
-			# print(self.__board)
 	
 			for i in self.__board.iterBoard(self.__board.cover):
 				return (i[0],i[1])
 			
-			# coveredTiles = [(x,y) for x,y, val in self.__board.iterBoard(self.__board.cover)]
-			# return coveredTiles[random.randint(0, len(coveredTiles)-1)]
-			
-			# coveredTiles = set([(x,y) for x,y, val in self.__board.iterBoard(self.__board.cover)])
-			# return (coveredTiles.pop())
-	
